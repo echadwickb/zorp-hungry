@@ -1,4 +1,6 @@
-(function() {
+
+// Let's get it started . . .
+var game = (function() {
   'use strict';
 
   var game = new Phaser.Game(
@@ -7,17 +9,28 @@
 
   var platforms,
       saucer,
-      zorp;
+      zorp,
+      music,
+      bombs,
+      eirinn;
 
   game.state.start('main');
 
+  return game;
+
   function preload() {
     game.load.spritesheet('saucer', 'assets/saucer.png', 32, 32);
-    game.load.spritesheet('zorp', 'assets/zorp.png', 32, 32);
-    game.load.spritesheet('descendingbeam', 'assets/descendingbeam.png', 32, 32);
+    game.load.spritesheet('zorp', 'assets/zorp.png', 64, 64);
     game.load.spritesheet('transferbeam', 'assets/transferbeam.png', 32, 32);
+    game.load.spritesheet('bomb', 'assets/bomb.png', 32, 32);
+    game.load.spritesheet('eirinn', 'assets/eirinn.png', 64, 64);
+
     game.load.image('sky', 'assets/sky.png');
     game.load.image('ground', 'assets/ground.png');
+    game.load.audio('bgmusic', [
+      'assets/bg-music.ogg',
+      'assets/bg-music.mp3'
+    ]);
   }
 
   function create() {
@@ -33,6 +46,13 @@
     ground.scale.setTo(8,1);
     ground.body.immovable = true;
 
+    bombs = game.add.group();
+
+    bombs.enableBody = true;
+    bombs.physicsBodyType = Phaser.Physics.ARCADE;
+
+    eirinn = characters.addEirinn();
+
     landZorp(game);
   }
 
@@ -40,28 +60,54 @@
 
     var cursors = game.input.keyboard.createCursorKeys()
 
+    game.physics.arcade.collide(bombs, platforms);
+
     if (zorp) {
-
+      game.physics.arcade.overlap(zorp, bombs, splodeZorp);
       game.physics.arcade.collide(zorp, platforms);
+      characters.dropBombs(bombs);
+    }
 
-      zorp.body.velocity.x = 0;
+    if (eirinn) {
+
+      game.physics.arcade.collide(eirinn, platforms);
+
+      eirinn.body.velocity.x = 0;
 
       if (cursors.left.isDown) {
-        zorp.body.velocity.x = -150;
-        zorp.animations.play('walkleft');
+        eirinn.body.velocity.x = -150;
+        if (!eirinn.body.touching.down) {
+          eirinn.animations.play('flyleft');
+
+        } else {
+          eirinn.animations.play('walkleft');
+        }
+
       }
       else if (cursors.right.isDown) {
-        zorp.body.velocity.x = 150;
-        zorp.animations.play('walkright');
+        eirinn.body.velocity.x = 150;
+
+        if (!eirinn.body.touching.down) {
+          eirinn.animations.play('flyright');
+        } else {
+          eirinn.animations.play('walkright');
+        }
+
       }
       else {
-        zorp.animations.stop();
-        zorp.frame = 2;
+        eirinn.animations.play('stand');
       }
 
-      if (cursors.up.isDown && zorp.body.touching.down) {
-        zorp.body.velocity.y = -300;
+      if (cursors.up.isDown && eirinn.body.touching.down) {
+        eirinn.body.velocity.y = -100;
       }
+
+
+    }
+
+    if (zorp && typeof music === 'undefined') {
+      music = game.add.audio('bgmusic', 1, true);
+      music.play();
     }
 
 
@@ -69,16 +115,7 @@
 
   function landZorp() {
 
-    saucer = game.add.sprite(game.world.centerX, 0, 'saucer');
-    saucer.scale.setTo(1.5, 1.5);
-
-    game.physics.arcade.enable(saucer);
-
-    saucer.body.collideWorldBounds = true;
-
-    saucer.animations.add('fly', [0,1,2,3,4,5], 12, true);
-
-    saucer.animations.play('fly');
+    saucer = characters.addSaucer();
 
     var saucerAppears = game.add.tween(saucer);
 
@@ -87,25 +124,11 @@
 
     saucerAppears.onComplete.add(function () {
 
-      var transferbeam = game.add.sprite(
-        saucer.position.x, saucer.position.y + 32, 'transferbeam');
-      transferbeam.scale.setTo(1.5,1.5);
-
-      transferbeam.animations.add('transfer');
-      transferbeam.animations.play('transfer', 12, false, true);
+      var transferbeam = characters.addTransferBeam(
+        saucer.body.x, saucer.body.y + 32);
 
       transferbeam.events.onAnimationComplete.add(function() {
-        zorp = game.add.sprite(
-          transferbeam.position.x, transferbeam.position.y, 'zorp');
-        zorp.scale.setTo(1.5,1.5);
-
-        game.physics.arcade.enable(zorp);
-
-        zorp.body.collideWorldBounds = true;
-        zorp.body.gravity.y = 300;
-
-        zorp.animations.add('walkleft', [0,1], 5, true);
-        zorp.animations.add('walkright', [3,4], 5, true);
+        zorp = characters.addZorp(transferbeam.position.x, transferbeam.position.y);
 
         var saucerDisappears = game.add.tween(saucer);
         saucerDisappears.to({y:0}, 2000);
@@ -115,8 +138,21 @@
           saucer.kill();
         })
       });
-
     });
   }
+
+
+  function splodeZorp(zorp, bomb) {
+
+    if (bomb && bomb.animations.name === 'dance') {
+      bomb.body.allowGravity = false;
+      bomb.animations.stop();
+      bomb.animations.play('splode', 10, false, true);
+    }
+  }
+
+
+
+
 
 }());
