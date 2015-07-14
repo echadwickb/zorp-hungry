@@ -12,6 +12,7 @@ var game = (function() {
       zorp,
       music,
       bombs,
+      grumperstorms,
       eirinn;
 
   game.state.start('main');
@@ -24,6 +25,7 @@ var game = (function() {
     game.load.spritesheet('transferbeam', 'assets/transferbeam.png', 32, 32);
     game.load.spritesheet('bomb', 'assets/bomb.png', 32, 32);
     game.load.spritesheet('eirinn', 'assets/eirinn.png', 64, 64);
+    game.load.spritesheet('grumperstorm', 'assets/grumperstorm.png', 200, 120);
 
     game.load.image('sky', 'assets/sky.png');
     game.load.image('ground', 'assets/ground.png');
@@ -51,8 +53,14 @@ var game = (function() {
     bombs.enableBody = true;
     bombs.physicsBodyType = Phaser.Physics.ARCADE;
 
+    grumperstorms = game.add.group();
+    grumperstorms.enableBody = true;
+    grumperstorms.physicsBodyType = Phaser.Physics.ARCADE;
+
     eirinn = characters.addEirinn();
 
+    characters.addGrumperStorm(20, 50, grumperstorms);
+    characters.addGrumperStorm(500, 20, grumperstorms);
     landZorp(game);
   }
 
@@ -65,7 +73,32 @@ var game = (function() {
     if (zorp) {
       game.physics.arcade.overlap(zorp, bombs, splodeZorp);
       game.physics.arcade.collide(zorp, platforms);
-      characters.dropBombs(bombs);
+      characters.dropBombs(bombs, grumperstorms);
+    }
+
+    if (grumperstorms) {
+
+      grumperstorms.forEach(function (grumperstorm) {
+
+        var newSpeed = game.rnd.integerInRange(15,20);
+
+        if (grumperstorm.body.position.x > 580) {
+
+          grumperstorm.body.velocity.x = -1 * newSpeed;
+          grumperstorm.frame = 0;
+
+        } else if (grumperstorm.body.position.x < 20) {
+          grumperstorm.body.velocity.x = newSpeed;
+          grumperstorm.frame = 1;
+
+        } else {
+
+          if (grumperstorm.body.velocity.x === 0) {
+            grumperstorm.body.velocity.x = newSpeed;
+          }
+        }
+      });
+
     }
 
     if (eirinn) {
@@ -82,7 +115,6 @@ var game = (function() {
         } else {
           eirinn.animations.play('walkleft');
         }
-
       }
       else if (cursors.right.isDown) {
         eirinn.body.velocity.x = 150;
@@ -92,16 +124,15 @@ var game = (function() {
         } else {
           eirinn.animations.play('walkright');
         }
-
-      }
-      else {
-        eirinn.animations.play('stand');
       }
 
       if (cursors.up.isDown && eirinn.body.touching.down) {
         eirinn.body.velocity.y = -100;
       }
 
+      if (eirinn.animations.currentAnim = 'flyleft') {
+
+      }
 
     }
 
@@ -141,7 +172,6 @@ var game = (function() {
     });
   }
 
-
   function splodeZorp(zorp, bomb) {
 
     if (bomb && bomb.animations.name === 'dance') {
@@ -150,9 +180,5 @@ var game = (function() {
       bomb.animations.play('splode', 10, false, true);
     }
   }
-
-
-
-
 
 }());

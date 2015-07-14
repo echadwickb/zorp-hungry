@@ -2,14 +2,17 @@ var characters = (function() {
   'use strict';
 
   var bombCount = 0,
-      maxBombs = 10;
+      maxBombs = 10,
+      lastDroppedBomb = 0,
+      bombIntervalms = 1200;
 
   return {
     addZorp: addZorp,
     addEirinn: addEirinn,
     dropBombs: dropBombs,
     addSaucer: addSaucer,
-    addTransferBeam: addTransferBeam
+    addTransferBeam: addTransferBeam,
+    addGrumperStorm: addGrumperStorm
   };
 
   function addZorp(x, y) {
@@ -60,14 +63,24 @@ var characters = (function() {
     return eirinn;
   }
 
-  function dropBombs(bombs) {
+  function dropBombs(bombs, grumperstorms) {
 
-    if (bombs.length < maxBombs) {
+    var currentTime = Date.now();
+    if (bombs.length < maxBombs &&
+        currentTime - lastDroppedBomb > bombIntervalms) {
+
+      var grumperstorm = grumperstorms.getRandom();
 
       var bomb = bombs.create(
-        game.rnd.integerInRange(20,780), 50, 'bomb');
+        game.rnd.integerInRange(
+          grumperstorm.position.x + 20,
+          grumperstorm.position.x + 180
+        ),
+        grumperstorm.position.y + 90,
+        'bomb'
+      );
 
-      bomb.scale.setTo(.75,.75);
+      //bomb.scale.setTo(.75,.75);
 
       bomb.name = 'bomb' + bombCount;
 
@@ -77,6 +90,8 @@ var characters = (function() {
       bomb.animations.add('dance', [1,1,2,3,3,2,1,1,2,0,0,2], 5, true);
       bomb.animations.add('splode', [4,5,4,4,6,5,4,5,4], 10, true);
       bomb.animations.play('dance');
+
+      lastDroppedBomb = Date.now();
     }
   }
 
@@ -107,6 +122,27 @@ var characters = (function() {
     transferbeam.animations.play('transfer', 12, false, true);
 
     return transferbeam;
+  }
+
+  function addGrumperStorm(x, y, grumperstorms) {
+
+    x = x || 50;
+    y = y || 20;
+
+    var grumperstorm = grumperstorms.create(x, y, 'grumperstorm');
+
+    // grumperstorm.scale.setTo(2,2);
+    game.physics.arcade.enable(grumperstorm);
+
+    grumperstorm.body.collideWorldBounds = true;
+    grumperstorm.body.gravity.y = 0;
+
+    //grumperstorm.animations.add('floatleft', 0, false, true);
+    //grumperstorm.animations.add('floatright', 1, false, true);
+
+    grumperstorm.frame = 1;
+
+    return grumperstorm;
   }
 
 }());
