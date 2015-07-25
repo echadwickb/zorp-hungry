@@ -1,0 +1,31 @@
+{
+  "name": "zorp-hungry",
+  "version": "1.0.0",
+  "description": "Feed Zorp",
+  "main": "zorp-hungry.js",
+  "dependencies": { },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-jshint": "^1.11.2",
+    "jshint-stylish": "^2.0.1",
+    "http-server": "^0.8.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/echadwickb/zorp-hungry.git"
+  },
+  "author": "Chad Brogan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/echadwickb/zorp-hungry/issues"
+  },
+  "homepage": "https://github.com/echadwickb/zorp-hungry#readme",
+  "jshintConfig": {
+      "undef": true,
+      "unused": true,
+      "predef": [ "require" ]
+    }
+}

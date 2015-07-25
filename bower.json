@@ -1,0 +1,22 @@
+{
+  "name": "zorp-hungry",
+  "main": "zorp-hungry.js",
+  "version": "1.0.0",
+  "homepage": "https://github.com/echadwickb/zorp-hungry",
+  "description": "Feed Zorp!",
+  "authors": [
+    "Chad Brogan"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "phaser": "~2.4.1",
+    "gulp": "~3.9.0"
+  }
+}

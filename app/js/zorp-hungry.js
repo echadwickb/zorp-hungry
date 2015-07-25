@@ -66,7 +66,7 @@ var game = (function() {
 
   function update() {
 
-    var cursors = game.input.keyboard.createCursorKeys()
+    var cursors = game.input.keyboard.createCursorKeys();
 
     game.physics.arcade.collide(bombs, platforms);
 
@@ -129,10 +129,11 @@ var game = (function() {
       if (cursors.up.isDown && eirinn.body.touching.down) {
         eirinn.body.velocity.y = -100;
       }
-
+      /*
       if (eirinn.animations.currentAnim = 'flyleft') {
 
       }
+      */
 
     }
 
@@ -167,7 +168,7 @@ var game = (function() {
 
         saucerDisappears.onComplete.add(function () {
           saucer.kill();
-        })
+        });
       });
     });
   }
