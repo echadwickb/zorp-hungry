@@ -13,7 +13,8 @@ var game = (function() {
       music,
       bombs,
       grumperstorms,
-      eirinn;
+      eirinn,
+      saucerSfx;
 
   game.state.start('main');
 
@@ -32,6 +33,10 @@ var game = (function() {
     game.load.audio('bgmusic', [
       'assets/bg-music.ogg',
       'assets/bg-music.mp3'
+    ]);
+    game.load.audio('saucerSfx', [
+      'assets/Spurceshurp.mp3',
+      'assets/Spurceshurp.ogg'
     ]);
   }
 
@@ -142,7 +147,12 @@ var game = (function() {
       music.play();
     }
 
-
+    if (saucer && typeof saucerSfx === 'undefined') {
+      saucerSfx = game.add.audio('saucerSfx');
+      saucerSfx.play();
+    } else if (!saucer && saucerSfx) {
+      saucerSfx.stop();
+    }
   }
 
   function landZorp() {
