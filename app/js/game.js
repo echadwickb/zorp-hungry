@@ -39,10 +39,15 @@ zorpHungry = (function() {
 
   function update() {
 
-    var cursors = game.input.keyboard.createCursorKeys();
+    var controls = game.input.keyboard.addKeys({
+      'space': Phaser.Keyboard.SPACEBAR,
+      'left': Phaser.Keyboard.LEFT,
+      'right': Phaser.Keyboard.RIGHT,
+      'up': Phaser.Keyboard.UP
+    });
 
     characters.zorp.update();
-    characters.eirinn.update(cursors);
+    characters.eirinn.update(controls);
     characters.grumperstorm.update();
     characters.saucer.update();
     characters.bombs.update();
