@@ -7,7 +7,8 @@ characters.bombs = (function() {
     bombCount: bombCount,
     addBomb: addBomb,
     get: get,
-    update: update
+    update: update,
+    splode: splode
   };
 
   function get() {
@@ -31,17 +32,28 @@ characters.bombs = (function() {
   }
 
   function addBomb(x,y) {
-    var bomb = bombs.create(x,y,'bomb');
 
-    bomb.name = 'bomb' + bombCount;
+    var bomb;
+    if (bombs.length > 10) {
+      bomb = bombs.getFirstDead();
+
+      if (bomb === null) {
+        return;
+      }
+      bomb.reset(x,y);
+    } else {
+      bomb = bombs.create(x,y,'bomb');
+      bomb.animations.add('dance', [1,1,2,3,3,2,1,1,2,0,0,2], 5, true);
+      bomb.animations.add('splode', [4,5,4,4,6,5,4,5,4], 10, true);
+    }
 
     game.physics.arcade.enable(bomb);
 
     bomb.body.collideWorldBounds = true;
     bomb.body.gravity.y = 200;
-    bomb.animations.add('dance', [1,1,2,3,3,2,1,1,2,0,0,2], 5, true);
-    bomb.animations.add('splode', [4,5,4,4,6,5,4,5,4], 10, true);
+
     bomb.animations.play('dance');
+
   }
 
   function update() {
@@ -60,7 +72,13 @@ characters.bombs = (function() {
     bomb.body.allowGravity = false;
     bomb.body = false;
     bomb.animations.stop();
-    bomb.animations.play('splode', 10, false, true);
+    bomb.animations.play('splode', 10, false, false);
+
+    bomb.events.onAnimationComplete.add(function () {
+      bombs.remove(bomb);
+      bomb.kill();
+    });
+
 
     return false;
   }

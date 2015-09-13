@@ -1,9 +1,7 @@
 characters.grumperstorm = (function() {
 
   var grumperstorms,
-      bombCount = 0,
-      maxBombs = 10,
-      lastDroppedBomb = 0,
+      bombTimes = 0,
       bombIntervalms = 5000;
 
   return {
@@ -32,7 +30,7 @@ characters.grumperstorm = (function() {
 
     var grumperstorm = grumperstorms.create(x, y, 'grumperstorm');
 
-    // grumperstorm.scale.setTo(2,2);
+    grumperstorm.anchor.setTo(0.5, 1);
     game.physics.arcade.enable(grumperstorm);
 
     grumperstorm.body.collideWorldBounds = true;
@@ -40,8 +38,8 @@ characters.grumperstorm = (function() {
 
     //grumperstorm.animations.add('floatleft', 0, false, true);
     //grumperstorm.animations.add('floatright', 1, false, true);
-
-    grumperstorm.frame = 1;
+    grumperstorm.animations.add('thunder', [1,1,1,1,1,1,2,3,4,3,4,2,0], false, true);
+    grumperstorm.frame = 0;
 
     return grumperstorm;
   }
@@ -54,20 +52,21 @@ characters.grumperstorm = (function() {
 
         var newSpeed = game.rnd.integerInRange(15,20);
 
-        if (grumperstorm.body.position.x > 580) {
-
-          grumperstorm.body.velocity.x = -1 * newSpeed;
-          grumperstorm.frame = 0;
-
-        } else if (grumperstorm.body.position.x < 20) {
-          grumperstorm.body.velocity.x = newSpeed;
-          grumperstorm.frame = 1;
-
-        } else {
-
-          if (grumperstorm.body.velocity.x === 0) {
+        if (grumperstorm.body.onWall()) {
+          if (grumperstorm.body.blocked.right) {
+            grumperstorm.body.velocity.x = newSpeed * -1;
+          } else {
             grumperstorm.body.velocity.x = newSpeed;
           }
+        }
+
+        if (grumperstorm.body.velocity.x === 0) {
+          grumperstorm.body.velocity.x = newSpeed;
+        }
+        if (grumperstorm.body.velocity.x < 0) {
+          grumperstorm.scale.x = 1;
+        } else {
+          grumperstorm.scale.x = -1;
         }
       });
 
@@ -79,22 +78,28 @@ characters.grumperstorm = (function() {
   }
 
   function dropBombs() {
-
-    var currentTime = Date.now();
-    if (characters.bombs.bombCount() < maxBombs &&
-        currentTime - lastDroppedBomb > bombIntervalms) {
+    if (bombTimes === 0 || game.time.now > bombTimes) {
 
       var grumperstorm = grumperstorms.getRandom();
+      grumperstorm.animations.play('thunder', 6, false);
 
-      characters.bombs.addBomb(
-        game.rnd.integerInRange(
-          grumperstorm.position.x + 20,
-          grumperstorm.position.x + 180
-        ),
-        grumperstorm.position.y + 90
-      );
+      bombTimes = game.time.now + bombIntervalms +  6000;
 
-      lastDroppedBomb = Date.now();
+      grumperstorm.events.onAnimationComplete.add(function (g) {
+
+        if (g.animations.name === 'thunder') {
+          characters.bombs.addBomb(
+            game.rnd.integerInRange(
+              g.position.x - 30,
+              g.position.x + 30
+            ),
+            g.position.y - 40
+          );
+
+        }
+      }, this);
+
     }
+
   }
 }());
