@@ -56,13 +56,14 @@ characters.saucer = (function() {
   }
 
   function update() {
-
+    
     if (saucer && typeof saucerSfx === 'undefined') {
       saucerSfx = game.add.audio('saucerSfx');
       saucerSfx.play();
     } else if (!saucer && saucerSfx) {
       saucerSfx.stop();
     }
+    
   }
 
   function addTransferBeam(x, y) {

@@ -3,7 +3,8 @@ characters.zorp = (function() {
       velocity = 50,
       gravity = 200,
       timeToChangeDirection = 0,
-      _self = this;
+      foodness = 50,
+      muchFood = 1000;
 
   return {
     preload: preload,

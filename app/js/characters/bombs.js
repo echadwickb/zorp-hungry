@@ -8,8 +8,13 @@ characters.bombs = (function() {
     addBomb: addBomb,
     get: get,
     update: update,
-    splode: splode
+    splode: splode,
+    getFirstDead: getFirstDead
   };
+
+  function getFirstDead() {
+    return bombs.getFirstDead();
+  }
 
   function get() {
     return bombs;

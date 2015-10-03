@@ -2,7 +2,8 @@ characters.grumperstorm = (function() {
 
   var grumperstorms,
       bombTimes = 0,
-      bombIntervalms = 5000;
+      bombIntervalms = 3000,
+      bombDropping = false;
 
   return {
     preload: preload,
@@ -22,6 +23,8 @@ characters.grumperstorm = (function() {
 
     addStorm(20, 50);
     addStorm(500, 20);
+    game.time.events.loop(3000, dropBombs, this);
+    game.time.events.loop(5000, dropFruits, this);
   }
 
   function addStorm(x, y) {
@@ -69,37 +72,53 @@ characters.grumperstorm = (function() {
           grumperstorm.scale.x = -1;
         }
       });
-
-      if (characters.zorp.exists()) {
-        dropBombs();
-      }
-
     }
   }
 
   function dropBombs() {
-    if (bombTimes === 0 || game.time.now > bombTimes) {
-
+   if ( characters.zorp.exists()) {
       var grumperstorm = grumperstorms.getRandom();
-      grumperstorm.animations.play('thunder', 6, false);
-
-      bombTimes = game.time.now + bombIntervalms +  6000;
-
-      grumperstorm.events.onAnimationComplete.add(function (g) {
-
-        if (g.animations.name === 'thunder') {
-          characters.bombs.addBomb(
-            game.rnd.integerInRange(
-              g.position.x - 30,
-              g.position.x + 30
-            ),
-            g.position.y - 40
-          );
-
-        }
-      }, this);
-
+      
+      if (characters.bombs.getFirstDead() !== null ||
+          characters.bombs.bombCount() < 20 ) { 
+        grumperstorm.animations
+                    .play('thunder', 6, false)
+                    .onComplete
+                    .addOnce(function () {
+            
+            characters.bombs.addBomb(
+              game.rnd.integerInRange(
+                grumperstorm.position.x - 30,
+                grumperstorm.position.x + 30
+              ),
+              grumperstorm.position.y - 40
+            );
+        });
+      }
     }
+  }
 
+  
+  function dropFruits() {
+   if ( characters.zorp.exists()) {
+      var grumperstorm = grumperstorms.getRandom();
+      
+      if (characters.fruits.getFirstDead() !== null ||
+          characters.fruits.fruitCount() < 20 ) { 
+        grumperstorm.animations
+                    .play('thunder', 6, false)
+                    .onComplete
+                    .addOnce(function () {
+            
+            characters.fruits.addFruit(
+              game.rnd.integerInRange(
+                grumperstorm.position.x - 30,
+                grumperstorm.position.x + 30
+              ),
+              grumperstorm.position.y - 40
+            );
+        });
+      }
+    }
   }
 }());

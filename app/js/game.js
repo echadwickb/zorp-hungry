@@ -20,6 +20,7 @@ zorpHungry = (function() {
     characters.saucer.preload();
     characters.bombs.preload();
     characters.zorp.preload();
+    characters.fruits.preload();
 
     map.preload();
 
@@ -35,6 +36,8 @@ zorpHungry = (function() {
     characters.grumperstorm.add();
     characters.saucer.add();
     characters.bombs.add();
+    characters.fruits.add();
+
   }
 
   function update() {
@@ -51,7 +54,7 @@ zorpHungry = (function() {
     characters.grumperstorm.update();
     characters.saucer.update();
     characters.bombs.update();
-
+    characters.fruits.update();
   }
 
   function render() {
